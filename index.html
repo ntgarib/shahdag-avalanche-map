@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Şahdüzü Winter Recreation Map</title>
+  <!-- Leaflet CSS (the only library used) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+  <style>\n    .evidence-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:1rem;}\n    .evidence-case{min-width:0;padding:1rem;border:1px solid var(--line);border-radius:6px;background:var(--card);}\n    .evidence-case h3{margin-top:0;}\n  </style>\n</head>
+<body>
+
+<!-- 1. HEADER ------------------------------------------------------------ -->
+<header id="top">
+  <h1>Şahdüzü Winter Recreation Map</h1>
+  <p class="subtitle">What free satellite data can tell us about snow, terrain and possible avalanche activity in the Şahdüzü pastures, Shahdag National Park, Azerbaijan.</p>
+  <div class="disclaimer" role="note">
+    <strong>Planning evidence, not a safety assessment.</strong> None of these layers says a slope is safe on any given day. Avalanche danger depends on the current snowpack and weather, and Shahdag has no avalanche forecast yet.
+  </div>
+</header>
+
+<main>
+
+<!-- 2. MAP --------------------------------------------------------------- -->
+<section id="map-section">
+  <h2>The map</h2>
+  <p class="howto"><strong>How to read this map.</strong> The background is a Sentinel-2 satellite image from 13 March 2025 or a relief view. Coloured areas show slope steepness; use the slider to fade them. Lines are seven recorded routes (click one for details). Red and orange outlines are optional radar snow-change patches from April 2025, which are possible avalanche activity and are unconfirmed. The marker shows a local report of an avalanche at Mahmud Dere in December 2017, with the radar patches matched to it.</p>
+  <div id="map"></div>
+  <div id="map-legend"></div>
+</section>
+
+<!-- 3. ROUTES ------------------------------------------------------------ -->
+<section id="routes-section">
+  <h2>Recorded routes</h2>
+  <p>Seven recorded routes compared with the slope map: how much of each runs on steep ground, and how many April 2025 snow-change patches lie within 500 m.</p>
+  <div id="route-table"></div>
+</section>
+
+<!-- 4. SNOW -------------------------------------------------------------- -->
+<section id="snow-section">
+  <h2>When is there snow?</h2>
+
+  <figure>
+    <figcaption>Snow season by elevation: median onset to melt-out in each 250 m band, 10 winters of MODIS data, with the range between winters.</figcaption>
+    <div id="chart-season"></div>
+  </figure>
+
+  <figure>
+    <figcaption>Share of the time snow is present, by month and elevation band (10-year average).</figcaption>
+    <div id="chart-heatmap"></div>
+  </figure>
+
+  <figure>
+    <figcaption>Monthly snowfall, rain and temperature, November to May (radar-box average), and total snowfall in each winter.</figcaption>
+    <div id="chart-snowfall"></div>
+  </figure>
+
+  <figure>
+    <figcaption>Median melt-out date by slope direction in each elevation band.</figcaption>
+    <div id="chart-meltout"></div>
+  </figure>
+</section>
+
+<!-- 5. EVIDENCE ---------------------------------------------------------- -->
+<section id="evidence-section">
+  <h2>Possible avalanche activity</h2>
+  <p>Sentinel-1 radar can show where the snow surface changed between two passes 12 days apart. We call these areas snow-change patches. They indicate possible avalanche activity; the patches are unconfirmed. Two cases were examined.</p>
+
+  <div class="evidence-cases">
+    <article class="evidence-case">
+      <h3>Mahmud Dere, Dec 2017</h3>
+      <p>Local report of an avalanche, 24–25 Dec 2017.</p>
+      <p>Patches within 1.5 km of the reported point: 3 on orbit 101 (19→31 Dec) and 5 on orbit 6 (13→25 Dec). Two patches overlap exactly between the two orbits, 425 m and 762 m from the reported point, at about 2,900–3,000 m. Timing: between 19 Dec and the early morning of 25 Dec.</p>
+      <p>Orbit 6, 25 Dec→6 Jan: none. Quiet control: 4 patches, none on the same spots. But 36 of 161 December patches box-wide are seen by both orbits, so the storm changed the snow widely.</p>
+      <p><span class="badge probable">Probable</span> not confirmed.</p>
+    </article>
+    <article class="evidence-case">
+      <h3>April 2025</h3>
+      <p>Storm 15–16 Apr, warm spell 21–27 Apr.</p>
+      <p>202 candidate patches (orbit 101, 17→29 Apr). Without a snow mask the first version gave 1,416, mostly snowmelt at low elevation.</p>
+      <p>16 also found by orbit 6, 186 not. That 8% agreement is about what chance gives, so it is not independent confirmation. None of the 202 overlap the quiet control (25 patches) or the summer control (158). The 26 strongest were checked in Sentinel-2 (20 m): no identifiable debris.</p>
+      <p><span class="badge unconfirmed">Unconfirmed</span></p>
+    </article>
+  </div>
+
+  <h3>All radar runs</h3>
+  <div id="runs-table"></div>
+</section>
+
+<!-- 6. MONITORING -------------------------------------------------------- -->
+<section id="monitoring-section">
+  <h2>Next step: storm-triggered monitoring</h2>
+  <p>Radar can only map possible avalanche activity after the fact, so the question is when to look. We propose a new radar check whenever the weather data show a trigger: 15 mm or more of snowfall (water) over 3 days, a sudden warm spell after snow, or heavy rain on snow. We tested these rules on the last 10 winters. They catch both known cases, Mahmud Dere in December 2017 and the April 2025 storm, and pick the same radar pairs we ran. Over a winter this means about 6 radar checks per orbit, because several events fall into the same 12-day pair. The first thing to run is a pair never tested: orbit 101, 5→17 April 2025, straight after the storm. The thresholds are starting values to recalibrate with real avalanche records. This builds a record of past events; it is not a warning system.</p>
+
+  <div id="monitoring-rules"></div>
+
+  <figure>
+    <figcaption>Trigger events in each winter, by type (storm, warm spell, rain on snow).</figcaption>
+    <div id="monitoring-timeline"></div>
+  </figure>
+
+  <div id="monitoring-thresholds"></div>
+  <div id="monitoring-cases"></div>
+</section>
+
+<!-- 7. SUGGESTS ---------------------------------------------------------- -->
+<section id="suggests-section">
+  <h2>What the evidence suggests</h2>
+
+  <h3>What the evidence shows</h3>
+  <p>About a third of the planning area (33%) is on slopes of 30° or more. The three Qızılqaya lines spend 0–4% of their length on such slopes. Snow lies from about 1 Nov to 19 Apr at 2,500–2,750 m and from 7 Oct to 25 May at 3,000–3,250 m. Radar suggests probable avalanche activity at Mahmud Dere in December 2017; the April 2025 patches are unconfirmed.</p>
+
+  <h3>What it suggests for discussion</h3>
+  <p>A small pilot on routes that avoid steep slopes, in the early season (Nov–Dec) and in spring (Mar–May), is worth discussing. These are candidates for professional assessment, not approved routes. Storm-triggered radar checks could build a local avalanche record.</p>
+
+  <h3>What needs the park's decision first</h3>
+  <p>Field assessment by certified avalanche professionals; a snow station and bulletin with Hydromet; rescue cover with the Emergencies Ministry; permits and border-zone rules with the State Border Service; a wildlife assessment.</p>
+</section>
+
+<!-- 8. LIMITS ------------------------------------------------------------ -->
+<section id="limits-section">
+  <h2>Limits</h2>
+  <div class="disclaimer" role="note">
+    <strong>Planning evidence, not a safety assessment.</strong> None of these layers says a slope is safe on any given day. Avalanche danger depends on the current snowpack and weather, and Shahdag has no avalanche forecast yet.
+  </div>
+  <ul>
+    <li>Sentinel-1A only; each orbit repeats every 12 days, so event dates are known only to a 12-day window.</li>
+    <li>Only orbits 101 (ascending) and 6 (descending) cover the study box; orbits 28 and 79 just graze it.</li>
+    <li>The radar shadow/layover mask is simple (it calls about 98% of the box visible).</li>
+    <li>The 30 m slope map misses short steep rolls and cornices; the "below steep slopes" runout measure is crude.</li>
+    <li>MODIS 500 m describes elevation bands, not individual slopes; snow cover is not snow depth.</li>
+    <li>ERA5-Land cells are about 11 km and run warm on peaks.</li>
+    <li>The December 2017 test rests on one local report; the point may mark the valley rather than the deposit.</li>
+    <li>Monitoring triggers use daily ERA5-Land box averages: they underestimate snow on the peaks, and a daily maximum temperature says nothing about the hour the satellite passes. Thresholds are starting values to recalibrate with real avalanche records.</li>
+    <li>The monthly snow maps give each elevation band and slope direction one average value, so they show general patterns, not snow at a particular spot.</li>
+  </ul>
+</section>
+
+</main>
+
+<!-- 9. CREDITS ----------------------------------------------------------- -->
+<footer id="credits">
+  <p>Contains modified Copernicus Sentinel-1 and Sentinel-2 data (2017–2025), processed in Google Earth Engine. Snow: MODIS MOD10A2 v6.1 (NASA). Weather: ERA5-Land (Copernicus Climate Change Service). Elevation: Copernicus DEM GLO-30, © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018 provided under COPERNICUS by the European Union and ESA. Method after Eckerstorfer &amp; Malnes (2015), Leinss et al. (2020), Hafner et al. (2021).</p>
+  <p>Routes are personal GPS recordings shown without timestamps.</p>
+</footer>
+
+<!-- Scripts: plain tags, no defer/async, in this order. js/*.js are written in later stages. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="web_ready/page_data.js"></script>
+<script src="js/map.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/monitoring.js"></script>
+</body>
+</html>
